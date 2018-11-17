@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>QuieroPedirYa.com</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js" type="text/javascript"></script>
+    <!--
+creo una pequeña descripcion del formulario que se da a continuacion para enviarse.
+-->
+           <center>
+    <body>
+        
+       
+       <script language="JavaScript" type="text/javascript">
+alert("el precio del transporte no está incluido y dependerá del lugar de entrega, este se deberá cancelar junto con el valor del pedido en el momento de la entrega.");
+</script>
+    
+    <img src="images/logo.PNG" alt=""/>
+        
+   
+    <section>      
+      <article>
+        <img src="images/formu.PNG" alt=""/>
+        <h3>A continuacion digite sus datos y seleccion de prendas, el sistema lo guiara y le avisara si ha sido exitoso el procedimiento</h3>
+        <div>
+          <h1>Por favor llena los datos</h1>
+          
+          
+          
+          
+            </div>
+      </article>      
+    </section>
+    <!--
+fin descripcion del formulario.
+-->
+        <script>
+            
+            
+      
+            
+            //comienzo con la creacion del formulario y los datos que se enviaran a la BD
+           
+           
+           $(document).ready(function (){
+            
+        $("#btnconsultar").click(function(){
+        var tabla="<table border='1'>" ;       
+        $.ajax({
+                    type: 'GET',
+                    url:"http://localhost:8080/FabricaRopa2/ropaservices/Ropa",
+                    contentType:'text/plain',
+                    dataType: 'json'
+                }).done(function(msg){
+                     console.log(msg);
+                   msg.forEach(function(elemento){
+                       
+                       tabla+="<tr>";
+                       tabla+="<td>"+elemento.numero_id+"</td>";
+                       tabla+="<td>"+elemento.nombre+"</td>";
+                       tabla+="<td>"+elemento.tipo_id+"</td>";
+                       tabla+="<td>"+elemento.direccion+"</td>";
+                       
+                       
+                       
+                       
+                        for(var c=0;c<elemento.tiporopa.length;c++){
+                        tabla+="<td>"+elemento.tiporopa[c].cantidad+"</td>"; //Se crea un for debido a que es una lista el tipo de ropa
+                      tabla+="<td>"+elemento.tiporopa[c].tipo_ropa+"</td>";
+                        tabla+="<td>"+elemento.tiporopa[c].precio+"</td>";
+                        tabla+="<td>"+elemento.tiporopa[c].fecha_entrega+"</td>";
+                        
+                        }
+                        tabla+="<tr>";
+                       
+                        
+                    });
+                     tabla+="</table>";
+                    $("#contenido").html(tabla);
+                }).error(function(er){
+                   alert(er); 
+                });
+                
+                
+        });//crearemos los parametros del formulario de pedido
+                
+                $("#btninsertar").click(function(){
+                    var nombre=$("#txtnombre").val();
+                    var numero_id=$("#txtnumero_id").val();
+                    var tipo_id=$("#txttipo_id").val();
+                    var direccion=$("#txtdireccion").val();
+                    // estamos creando variables del cliente y despues datos de la ropa
+                    var cantidad=$("#txtcantidad").val();                 
+                    var fecha_entrega=$("#txtfecha_entrega").val();
+                    var precio=parseFloat($("#txtprecio").val());
+                   var tipo_ropa=$("#txttipo_ropa").val();
+                    
+                    datos={"nombre":nombre,"numero_id":numero_id,"tipo_id":tipo_id,"direccion":direccion,"tiporopa":[{"cantidad":cantidad,"tipo_ropa":tipo_ropa,"precio":precio,"fecha_entrega":fecha_entrega }]};
+                    $.ajax({
+                     type: 'POST',
+                     dataType: 'text',
+                     url:"http://localhost:8080/FabricaRopa2/ropaservices/Ropa",
+                     contentType: 'application/json',
+                     data: JSON.stringify(datos),
+                    }).done(function(msg){
+                       alert("Pedido realizado"); 
+                       alert("El costo del pedido tiene 8000 de recargo extra"); 
+                          document.location.reload();
+                    }).error(function(er){
+                        console.log(er);
+                    });
+                });
+                $("#btnmodificar").click(function(){
+                    
+                var nombre=$("#txtnombre").val();
+                    var numero_id=$("#txtnumero_id").val();
+                    var tipo_id=$("#txttipo_id").val();
+                    var direccion=$("#txtdireccion").val();
+                    // estamos creando variables del cliente y despues datos de la ropa
+                    var cantidad=$("#txtcantidad").val();                 
+                    var fecha_entrega=$("#txtfecha_entrega").val();
+                    var precio=parseFloat($("#txtprecio").val());
+                   var tipo_ropa=$("#txttipo_ropa").val();
+                    
+                    datos={"nombre":nombre,"numero_id":numero_id,"tipo_id":tipo_id,"direccion":direccion,"tiporopa":[{"cantidad":cantidad,"tipo_ropa":tipo_ropa,"precio":precio,"fecha_entrega":fecha_entrega }]};
+                   
+                    $.ajax({
+                     type: 'PUT',
+                     dataType: 'text',
+                     url:"http://localhost:8080/FabricaRopa2/ropaservices/Ropa",
+                     contentType: 'application/json',
+                     data: JSON.stringify(datos),
+                    }).done(function(msg){
+                       alert("Se realizo la modificacion correctamente"); 
+                          document.location.reload();
+                    }).error(function(er){
+                        console.log(er);
+                    });
+                
+                   });
+                 $("#btneliminar").click(function(){
+                    var numero_id=$("#txtnumero_id").val();
+                   $.ajax({
+                     type: 'DELETE',
+                     contentType: 'text/plain',
+                     data: 'text',
+                     url:"http://localhost:8080/FabricaRopa2/ropaservices/Ropa"+numero_id,
+                   }).done(function(msg){
+                       alert(numero_id+" Registro ha sido eliminado");
+                       document.location.reload();
+                   }).error(function(er){
+                      console.log(er); 
+                   });
+                });
+        
+        
+        });    
+            
+        </script>
+    </head>
+    <body>
+        <div id="contenido"></div>
+        Identificacion:<input type="txt" id="txtnumero_id">
+        Nombre:<input type="txt" id="txtnombre">
+        Tipo Documento:<input type="txt" id="txttipo_id">
+        Direccion:<input type="txt" id="txtdireccion">
+       
+        
+        Tipo Ropa:<select id="txttipo_ropa">
+            <option>Pantalon</option>
+            <option>Chaqueta</option>
+            <option>Camisa Formal</option>
+            </select>
+        Cantidad ropa:<select id="txtcantidad">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            </select>
+        Precio:<input type="txt" id="txtprecio">
+        Fecha Entrega:<input type="txt" id="txtfecha_entrega">
+        
+        <br>
+
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+        
+        <input type="button" id= "btnconsultar" Value="Consultar">
+        <input type="button" id= "btninsertar" Value="Insertar">
+        <input type="button" id= "btnmodificar" Value="Modificar">
+        <input type="button" id= "btneliminar" Value="Eliminar">
+        
+        
+        
+        <footer>
+      <h4>Informacion de Contacto</h4>
+       <a href="/ibmprueba/contacto.html">| CONTACTAME |</a>
+       <nav>
+      <a href="/ibmprueba/index.html"> | Inicio |</a>
+      <a href="/ibmprueba/documen.html"> | Documentacion |</a>
+      <a href="/ibmprueba/junit.html"> | Junit Test |</a>
+      <a href="https://www.ibm.com/co-es/"> | Patrocinador |</a>
+      
+    </nav>
+      </center>
+    </footer>
+  </body>  
+</html>
+        
+        
+    
